@@ -1,4 +1,4 @@
-# Market Efficiency Measurement via VAR-Based Feature Engineering
+# A Composite Market Efficiency Index Based on VAR Dynamics
 
 This project constructs a **composite market efficiency index** by combining
 VAR-based price discovery measures with additional market microstructure indicators.

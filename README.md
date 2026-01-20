@@ -1,26 +1,26 @@
 # A Composite Market Efficiency Index Based on VAR Dynamics
 
-This project constructs a **composite market efficiency index** by combining
-VAR-based price discovery measures with additional market microstructure indicators.
-The goal is to provide a transparent, reproducible pipeline for measuring
-market performance and efficiency over time.
+This project constructs a **composite market efficiency index** based on
+rolling VAR models and market microstructure indicators, using China corn
+futures and spot market data as an empirical application.
 
-The project is designed for **research-oriented financial analysis**, with an
-emphasis on interpretability, statistical rigor, and modular code structure.
+The repository is organized as a **research-oriented analysis pipeline**,
+with Jupyter notebooks for step-by-step execution and modular Python code
+for reusable core logic.
 
 ---
 
 ## Project Overview
 
-The pipeline consists of four major stages:
+The objective of this project is to quantify market efficiency by integrating:
 
-1. **VAR-based dynamic feature extraction**
-2. **Feature normalization and transformation**
-3. **Entropy-based weighting and index construction**
-4. **Nonlinear validation via neural network modeling**
+- Dynamic price discovery information extracted from VAR models
+- Volatility, liquidity, and cross-market dispersion indicators
+- Entropy-based weighting to construct a composite performance index
+- Neural network modeling for nonlinear validation
 
-All core algorithms are implemented in reusable Python modules,
-while Jupyter notebooks are used only for orchestration and experimentation.
+The final output is a **Market Efficiency Index**, summarized at
+different frequencies (daily, quarterly, annual).
 
 ---
 
@@ -28,52 +28,133 @@ while Jupyter notebooks are used only for orchestration and experimentation.
 
 ### Raw Data (`data/raw/`)
 
-- Corn futures prices (multiple contracts)
-- National and regional spot prices
-- Trading volume and liquidity measures
+- Corn futures prices (multiple delivery contracts)
+- National average spot prices
+- Regional spot prices by exchange
+- Futures–spot combined price dataset
 
-### Processed Features (`data/processed/`)
+### Geographic Data (`data/geo/`)
 
-The final feature set includes **five indicators**:
+- `china_boundary.shp`: used for spatial visualization of spot price dispersion
 
-| Feature Name | Description |
-|-------------|------------|
-| Price Discovery Speed | Average lag from VAR impulse response |
-| Price Discovery Strength | Variance decomposition contribution |
-| Futures Price Volatility | Rolling volatility measure |
-| Regional Spot Price Dispersion | Cross-market spot price spread |
-| Futures Trading Scale | Trading volume / liquidity proxy |
+---
 
-These features are combined into a single **Market Efficiency Index**.
+## Processed Data (`data/processed/`)
+
+Key intermediate and final outputs include:
+
+| File | Description |
+|-----|------------|
+| `rolling_var_and_market_features.xlsx` | VAR-based features and market indicators |
+| `zscore_normalized_features.xlsx` | Z-score standardized features |
+| `zscore_shifted_features.xlsx` | Shifted features for entropy weighting |
+| `rolling_var_and_market_features_weights.xlsx` | Entropy-based feature weights |
+| `market_efficiency_index.xlsx` | Composite market efficiency index |
+| `market_efficiency_index_annual_mean.xlsx` | Annual average index |
+| `market_efficiency_index_quarterly_mean.xlsx` | Quarterly average index |
 
 ---
 
 ## Methodology
 
-### 1. VAR-Based Feature Engineering
+### 1. Data Exploration
 
-- Rolling-window VAR models are estimated on differenced price series
-- Optimal lag order is selected using AIC
-- Two key indicators are extracted:
-  - Variance decomposition contribution
-  - Impulse response–based average lag
+Notebook: `01_data_exploration.ipynb`
 
-### 2. Feature Normalization
-
-Features are standardized using:
-
-- **Z-score normalization**
-- Optional **min–max normalization**
-- Positive shift applied to avoid numerical issues in entropy calculation
-
-All transformations are implemented as reusable functions.
+- Preliminary inspection of futures and spot price data
+- Visualization and descriptive statistics
 
 ---
 
-### 3. Entropy Weighting & Index Construction
+### 2. VAR Modeling and Feature Extraction
 
-- Entropy values are computed for each feature
-- Feature weights are derived from information content
-- A weighted aggregation yields the **Market Efficiency Index**
+Notebook: `02_var_model.ipynb`
 
-This step produces the final target variable:
+- Rolling-window VAR estimation
+- Lag order selection using AIC
+- Feature extraction:
+  - Price discovery speed (impulse response–based)
+  - Price discovery strength (variance decomposition)
+
+---
+
+### 3. Feature Standardization
+
+Notebook: `03_feature_standardization.ipynb`
+
+- Z-score normalization
+- Optional min–max scaling
+- Positive shifting to ensure non-negativity
+
+---
+
+### 4. Feature Weighting
+
+Notebook: `04_feature_weighting.ipynb`
+
+- Entropy-based weighting method
+- Objective determination of feature importance
+
+---
+
+### 5. Composite Index Construction
+
+Notebook: `05_composite_index.ipynb`
+
+- Weighted aggregation of standardized features
+- Construction of the **Market Efficiency Index**
+- Temporal aggregation (quarterly and annual means)
+
+---
+
+### 6. Neural Network Validation
+
+Notebook: `06_neural_network.ipynb`
+
+- BP neural network modeling
+- Evaluation of nonlinear mapping between features and index
+- Model performance assessed using multiple error metrics
+
+> Note:  
+> The neural network is used for **robustness and nonlinear validation**,  
+> not for out-of-sample forecasting.
+
+---
+
+## Code Structure (`src/`)
+
+The `src/` directory contains reusable components:
+
+- `var/` — VAR estimation and dynamic feature extraction
+- `indexing_preprocessing/` — feature scaling and transformation
+- `indexing/` — entropy weighting and index construction
+- `bp_neural_network/` — neural network modeling utilities
+
+---
+
+## How to Run
+
+1. Clone the repository
+2. Install required Python packages:
+   - pandas
+   - numpy
+   - statsmodels
+   - scikit-learn
+3. Run notebooks sequentially from `01` to `06`
+
+All file paths are relative and the pipeline is reproducible on other machines.
+
+---
+
+## Intended Audience
+
+- Researchers in financial econometrics
+- Quantitative analysts
+- Graduate students in statistics, finance, or economics
+
+---
+
+## Disclaimer
+
+This project is for academic and research demonstration purposes only.
+It does not constitute investment advice.
